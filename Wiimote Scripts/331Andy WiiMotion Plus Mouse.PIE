@@ -1,0 +1,145 @@
+﻿/*
+  Leave the Wiimote on your desk before clicking Run so it can calibrate.
+    (orientation does not matter, as long as it does not move.)
+  Hold Up to move the mouse,
+  Z = Left-Click,
+  B = Right-Click,
+  C = Middle-Click.
+*/
+
+var.Scalar = 0.5  // Default is 0.5
+var.PanTiltPercent = 0.10 // Default is 10% (0.10). 0.00 is Horizontal, 1.00 is Vertical.
+var.VertSlowdownAtSpeed = 200 // Default is 200. Lower means more slowdown at lower horizontal speeds
+PIE.FrameRate = 120hz
+
+/*
+Keyboard.One = var.WeaponOne
+Keyboard.Two = var.WeaponTwo
+Keyboard.Three = var.WeaponThree
+Keyboard.Four = var.WeaponFour
+*/
+//Keyboard.RepeatFakeKeys = false
+//Keyboard.RepeatMultipleFakeKeys = false
+var.ModifierButton = Nunchuk.C
+if (not var.ModifierButton) then    var.LookButton = Wiimote.A // or Wiimote.B or Wiimote.Right or Wiimote.Down or Wiimote.A or Wiimote.Left or Wiimote.Minus or Wiimote.Plus or Wiimote.One or Wiimote.Two
+Keyboard.P         = var.ModifierButton          and Wiimote.A
+if (not var.ModifierButton) then Mouse.RightButton = Wiimote.B
+Keyboard.R         = var.ModifierButton          and Wiimote.B
+Mouse.LeftButton   = Nunchuk.Z
+Mouse.MiddleButton = DoubleClicked(Nunchuk.C)
+WASD               = Nunchuk.Joy
+//if (not var.ModifierButton) then            WASD = Nunchuk.Joy
+//Keyboard.R         = var.ModifierButton        and Nunchuk.Right
+//Keyboard.R         = var.ModifierButton        and Nunchuk.Left
+if (not var.ModifierButton) then Keyboard.Escape = Wiimote.Home
+Keyboard.M         = var.ModifierButton        and Wiimote.Home
+if (not var.ModifierButton) then Keyboard.E      = Wiimote.Minus
+Keyboard.O         = var.ModifierButton        and Wiimote.Minus
+if (not var.ModifierButton) then Keyboard.Space  = Wiimote.Plus
+Keyboard.C         = var.ModifierButton        and Wiimote.Plus
+Keyboard.Right     = var.WiimoteRollRight
+Keyboard.Left      = var.WiimoteRollLeft
+Keyboard.T         = Wiimote.Up
+Keyboard.H         = Wiimote.Down
+Mouse.WheelUp      = Wiimote.Right
+Mouse.WheelDown    = Wiimote.Left
+Keyboard.Up        = Wiimote.One
+Keyboard.Down      = Wiimote.Two
+
+/*
+Credit: NanoPi's joymouse.PIE
+        https://gist.github.com/NanoPi/315d6276c65291e0dfa2
+GlovePIE specific: it is actually extremely important to set X and Y
+positions in a SINGLE assignment command or line of code
+
+good:
+mouse.CursorPos = [var.mx,var.my]
+good:
+[mouse.CursorPosX,mouse.CursorPosY] = [var.mx,var.my]
+bad:
+mouse.CursorPosX = var.mx
+mouse.CursorPosY = var.my
+
+Q: why is it bad?
+A: you will get a stair effect when moving diagonally
+*/
+if wiimote.HasMotionPlus = false then debug = "WiiMotion Plus NOT DETECTED!"
+if wiimote.HasMotionPlus = true and var.LookButton = true {
+    //var.SpeedX = Smooth(Wiimote.MotionPlus.RawYawSpeed, 3)
+    //var.SpeedY = -1 * Smooth(Wiimote.MotionPlus.RawPitchSpeed, 3)
+    [var.SpeedX, var.SpeedY] = [Smooth(Wiimote.MotionPlus.RawYawSpeed, 2), -1 * Smooth(Wiimote.MotionPlus.RawPitchSpeed, 2)]
+    // DebugPrint('var.SpeedX: ' + var.SpeedX) // typically -600 to 600.
+    // The higher SpeedX is, the lower the SpecialScalar is
+    //   so the faster the hori movement, the less the vert sensitivity is.
+    var.SpecialScalar = var.VertSlowdownAtSpeed/(var.VertSlowdownAtSpeed+Abs(var.SpeedX))
+    //Mouse.DirectInputX = var.MouseX
+    //Mouse.DirectInputY = var.MouseY
+    Mouse.DirectInput2D = [var.MouseX, var.MouseY]
+    //var.MouseX = var.MouseX + (var.SpeedX * var.Scalar)
+    //var.MouseY = var.MouseY + (var.SpeedY * var.Scalar * var.SpecialScalar)
+    [var.MouseX, var.MouseY] = [var.MouseX, var.MouseY] + [var.SpeedX * var.Scalar, (var.SpeedY * var.Scalar * var.SpecialScalar) - (var.SpeedX * var.PanTiltPercent)]
+}
+
+if var.LookButton = false {
+    //var.MouseX = Mouse.DirectInputX
+    //var.MouseY = Mouse.DirectInputY
+    [var.MouseX, var.MouseY] = [Mouse.DirectInputX, Mouse.DirectInputY]
+}
+
+if (var.LookButton = false and Wiimote.SmoothRoll > 70) {
+   //DebugPrint('Wiimote Roll right: ' + Wiimote.SmoothRoll)
+   var.WiimoteRollRight = true
+} else {
+   var.WiimoteRollRight = false
+}
+
+if (var.LookButton = false and Wiimote.SmoothRoll < -70) {
+   //DebugPrint('Wiimote Roll left: ' + Wiimote.SmoothRoll)
+   var.WiimoteRollLeft = true
+} else {
+   var.WiimoteRollLeft = false
+}
+
+/*
+if (Nunchuk.SmoothRoll > 60) {
+   //DebugPrint('Nunchuk Roll right: ' + Nunchuk.SmoothRoll)
+   var.NunchukRollRight = true
+} else {
+   var.NunchukRollRight = false
+}
+
+if (Nunchuk.SmoothRoll < -60) {
+   //DebugPrint('Nunchuk Roll left: ' + Nunchuk.SmoothRoll)
+   var.NunchukRollLeft = true
+} else {
+   var.NunchukRollLeft = false
+}
+*/
+
+/*
+var.CycleThrough = Pressed(Wiimote.Left) or Pressed(Wiimote.Right)
+if (var.CycleThrough = true) {
+   var.WeaponCycleState = var.WeaponCycleState + int(Wiimote.Right) - int(Wiimote.Left)
+   if (var.WeaponCycleState < 1) {
+       var.WeaponCycleState = 4
+   }
+   if (var.WeaponCycleState > 4) {
+       var.WeaponCycleState = 1
+   }
+   var.CycleThrough = false
+}
+
+if (var.WeaponCycleState = 3) {
+   var.WeaponTwo = Wiimote.Left
+   var.WeaponFour = Wiimote.Right
+} else if (var.WeaponCycleState = 4) {
+   var.WeaponThree = Wiimote.Left
+   var.WeaponOne = Wiimote.Right
+} else if (var.WeaponCycleState = 1) {
+   var.WeaponFour = Wiimote.Left
+   var.WeaponTwo = Wiimote.Right
+} else {
+   var.WeaponOne = Wiimote.Left
+   var.WeaponThree = Wiimote.Right
+}
+*/
