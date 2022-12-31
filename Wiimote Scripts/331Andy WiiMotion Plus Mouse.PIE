@@ -1,50 +1,52 @@
-﻿/*
+/*
   Leave the Wiimote on your desk before clicking Run so it can calibrate.
     (orientation does not matter, as long as it does not move.)
-  Hold Up to move the mouse,
-  Z = Left-Click,
-  B = Right-Click,
-  C = Middle-Click.
+  Hold Wiimote A to move the mouse,
+  Nunchuk Z = Left-Click,
+  Wiimote B = Right-Click,
+  Double-tap Wiimote B = Middle-Click.
 */
 
-var.Scalar = 0.5  // Default is 0.5
+var.Sensitivity = 1  // Default is 1
 var.PanTiltPercent = 0.10 // Default is 10% (0.10). 0.00 is Horizontal, 1.00 is Vertical.
 var.VertSlowdownAtSpeed = 200 // Default is 200. Lower means more slowdown at lower horizontal speeds
 PIE.FrameRate = 120hz
 
-/*
-Keyboard.One = var.WeaponOne
-Keyboard.Two = var.WeaponTwo
-Keyboard.Three = var.WeaponThree
-Keyboard.Four = var.WeaponFour
-*/
-//Keyboard.RepeatFakeKeys = false
-//Keyboard.RepeatMultipleFakeKeys = false
-var.ModifierButton = Nunchuk.C
-if (not var.ModifierButton) then    var.LookButton = Wiimote.A // or Wiimote.B or Wiimote.Right or Wiimote.Down or Wiimote.A or Wiimote.Left or Wiimote.Minus or Wiimote.Plus or Wiimote.One or Wiimote.Two
-Keyboard.P         = var.ModifierButton          and Wiimote.A
-if (not var.ModifierButton) then Mouse.RightButton = Wiimote.B
-Keyboard.R         = var.ModifierButton          and Wiimote.B
-Mouse.LeftButton   = Nunchuk.Z
-Mouse.MiddleButton = DoubleClicked(Nunchuk.C)
-WASD               = Nunchuk.Joy
-//if (not var.ModifierButton) then            WASD = Nunchuk.Joy
-//Keyboard.R         = var.ModifierButton        and Nunchuk.Right
-//Keyboard.R         = var.ModifierButton        and Nunchuk.Left
-if (not var.ModifierButton) then Keyboard.Escape = Wiimote.Home
-Keyboard.M         = var.ModifierButton        and Wiimote.Home
-if (not var.ModifierButton) then Keyboard.E      = Wiimote.Minus
-Keyboard.O         = var.ModifierButton        and Wiimote.Minus
-if (not var.ModifierButton) then Keyboard.Space  = Wiimote.Plus
-Keyboard.C         = var.ModifierButton        and Wiimote.Plus
-Keyboard.Right     = var.WiimoteRollRight
-Keyboard.Left      = var.WiimoteRollLeft
-Keyboard.T         = Wiimote.Up
-Keyboard.H         = Wiimote.Down
-Mouse.WheelUp      = Wiimote.Right
-Mouse.WheelDown    = Wiimote.Left
-Keyboard.Up        = Wiimote.One
-Keyboard.Down      = Wiimote.Two
+/* Key and Mouse bindings: */
+var.ModifierButton   = Nunchuk.C
+var.LookButton       = Wiimote.A // or Wiimote.B or Wiimote.Right or Wiimote.Down or Wiimote.A or Wiimote.Left or Wiimote.Minus or Wiimote.Plus or Wiimote.One or Wiimote.Two
+WASD                 = Nunchuk.Joy
+Keyboard.LeftShift   = var.ModifierButton
+Mouse.LeftButton     = var.NunchukZ
+Mouse.MiddleButton   = var.NunchukZModified
+Mouse.RightButton    = var.WiimoteB
+Keyboard.R           = var.WiimoteBModified
+Keyboard.Escape      = var.WiimoteHome
+Keyboard.M           = var.WiimoteHomeModified
+Keyboard.E           = var.WiimoteMinus
+Keyboard.Q           = var.WiimoteMinusModified
+Keyboard.Space       = var.WiimotePlus
+Keyboard.LeftControl = var.WiimotePlusModified
+Keyboard.Right       = var.WiimoteRollRight
+Keyboard.Left        = var.WiimoteRollLeft
+Keyboard.F           = Wiimote.Up
+Keyboard.V           = Wiimote.Down
+Mouse.WheelUp        = Wiimote.Right
+Mouse.WheelDown      = Wiimote.Left
+Keyboard.G           = Wiimote.One
+Keyboard.B           = Wiimote.Two
+
+/* Modifiables: */
+if (not var.ModifierButton) then var.WiimoteHome = Wiimote.Home
+var.WiimoteHomeModified   = var.ModifierButton and Wiimote.Home
+if (not var.ModifierButton) then var.WiimoteMinus = Wiimote.Minus
+var.WiimoteMinusModified   = var.ModifierButton and Wiimote.Minus
+if (not var.ModifierButton) then var.WiimotePlus = Wiimote.Plus
+var.WiimotePlusModified   = var.ModifierButton and Wiimote.Plus
+if (not var.ModifierButton) then var.NunchukZ = Nunchuk.Z
+var.NunchukZModified   = var.ModifierButton and Nunchuk.Z
+if (not var.ModifierButton) then var.WiimoteB = Wiimote.B
+var.WiimoteBModified   = var.ModifierButton and Wiimote.B
 
 /*
 Credit: NanoPi's joymouse.PIE
@@ -75,9 +77,9 @@ if wiimote.HasMotionPlus = true and var.LookButton = true {
     //Mouse.DirectInputX = var.MouseX
     //Mouse.DirectInputY = var.MouseY
     Mouse.DirectInput2D = [var.MouseX, var.MouseY]
-    //var.MouseX = var.MouseX + (var.SpeedX * var.Scalar)
-    //var.MouseY = var.MouseY + (var.SpeedY * var.Scalar * var.SpecialScalar)
-    [var.MouseX, var.MouseY] = [var.MouseX, var.MouseY] + [var.SpeedX * var.Scalar, (var.SpeedY * var.Scalar * var.SpecialScalar) - (var.SpeedX * var.PanTiltPercent)]
+    //var.MouseX = var.MouseX + (var.SpeedX * 0.5)
+    //var.MouseY = var.MouseY + (var.SpeedY * 0.5 * var.SpecialScalar)
+    [var.MouseX, var.MouseY] = [var.MouseX, var.MouseY] + [var.SpeedX * 0.5 * var.Sensitivity, (var.SpeedY * 0.5 * var.Sensitivity * var.SpecialScalar) - (var.SpeedX * var.PanTiltPercent)]
 }
 
 if var.LookButton = false {
@@ -116,7 +118,15 @@ if (Nunchuk.SmoothRoll < -60) {
 }
 */
 
+
 /*
+// Cycle through weapons 1,2,3,4 with left and right Wiimote:
+
+Keyboard.One = var.WeaponOne
+Keyboard.Two = var.WeaponTwo
+Keyboard.Three = var.WeaponThree
+Keyboard.Four = var.WeaponFour
+
 var.CycleThrough = Pressed(Wiimote.Left) or Pressed(Wiimote.Right)
 if (var.CycleThrough = true) {
    var.WeaponCycleState = var.WeaponCycleState + int(Wiimote.Right) - int(Wiimote.Left)
