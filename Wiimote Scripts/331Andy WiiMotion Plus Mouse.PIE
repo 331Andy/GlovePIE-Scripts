@@ -10,14 +10,14 @@ Nunchuk.Calibrated = false
 var.Sensitivity      = 1   // Default is 1
 var.JoystickDeadzone = 0.2 // Default is 0.2
 var.DiagnlPercentage = 0.415 // 0.415 is about 22.5 degrees
-var.WalkSprintZone   = 0.82 // Default is 0.82 for walk, 1.32 for sprint.
+var.WalkSprintZone   = 1.02 // Default is 0.82 for walk, 1.32 for sprint.
 var.PanTiltPercent   = 0.0 // 10% is 0.1; 0.0 is Horizontal, 1.0 is Vertical.
 var.VertSlowdownAtSpeed = 60 // Default is 200. Lower means more slowdown at lower horizontal speeds
 PIE.FrameRate = 120hz
 
 /* Key and Mouse bindings: */
 var.ModifierButton   = var.NunchukRollLeft or var.NunchukRollRight //Nunchuk.C
-var.LookButton       = Wiimote.Up or Wiimote.A or Wiimote.Left or Wiimote.Right // or Wiimote.B or Wiimote.Down or Wiimote.Minus or Wiimote.Plus or Wiimote.One or Wiimote.Two
+var.LookButton       = var.WiimoteUp or var.WiimoteA or var.WiimoteDown or var.WiimoteLeft or var.WiimoteRight // or Wiimote.B or Wiimote.Minus or Wiimote.Plus or Wiimote.One or Wiimote.Two
 Keyboard.W           = var.Fwd
 Keyboard.A           = var.Lt
 Keyboard.S           = var.Bkwd
@@ -41,40 +41,45 @@ Keyboard.R           = var.WiimoteDown
 Keyboard.G           = var.WiimoteRight
 Keyboard.Space       = var.WiimoteA
 Keyboard.E           = var.WiimoteAModified
-//Keyboard.Tab         = var.WiimoteRollRightModified
-//Keyboard.Tab         = var.WiimoteRollLeftModified
 Keyboard.B           = Wiimote.One
 Keyboard.Tab         = Wiimote.Two
-//Keyboard.I           = var.WiimoteOneModified
-//Keyboard.K           = var.WiimoteTwoModified
 
 /* Modifiables: */
-if (not var.ModifierButton) then var.NunchukZ = Nunchuk.Z
-var.NunchukZModified   = var.ModifierButton and Nunchuk.Z
-if (not var.ModifierButton) then var.NunchukC = Nunchuk.C
-var.NunchukCModified   = var.ModifierButton and Nunchuk.C
-if (not var.ModifierButton) then var.WiimoteA = Wiimote.A
-var.WiimoteAModified   = var.ModifierButton and Wiimote.A
-//if (not var.ModifierButton) then var.WiimoteB = Wiimote.B
-//var.WiimoteBModified   = var.ModifierButton and Wiimote.B
-if (not var.ModifierButton) then var.WiimoteRight = Wiimote.Right
-var.WiimoteRightModified   = var.ModifierButton and Wiimote.Right
-if (not var.ModifierButton) then var.WiimoteDown = Wiimote.Down
-var.WiimoteDownModified   = var.ModifierButton and Wiimote.Down
-if (not var.ModifierButton) then var.WiimoteLeft = Wiimote.Left
-var.WiimoteLeftModified   = var.ModifierButton and Wiimote.Left
-if (not var.ModifierButton) then var.WiimoteUp = Wiimote.Up
-var.WiimoteUpModified   = var.ModifierButton and Wiimote.Up
-if (not var.ModifierButton) then var.WiimoteMinus = Wiimote.Minus
-var.WiimoteMinusModified   = var.ModifierButton and Wiimote.Minus
-if (not var.ModifierButton) then var.WiimoteHome = Wiimote.Home
-var.WiimoteHomeModified   = var.ModifierButton and Wiimote.Home
-if (not var.ModifierButton) then var.WiimotePlus = Wiimote.Plus
-var.WiimotePlusModified   = var.ModifierButton and Wiimote.Plus
-//if (not var.ModifierButton) then var.WiimoteOne = Wiimote.One
-//var.WiimoteOneModified   = var.ModifierButton and Wiimote.One
-//if (not var.ModifierButton) then var.WiimoteTwo = Wiimote.Two
-//var.WiimoteTwoModified   = var.ModifierButton and Wiimote.Two
+if (var.ModifierButton = false) {
+   var.WiimoteA             = Wiimote.A
+   var.WiimoteAModified     = false
+   var.WiimoteRight         = Wiimote.Right
+   var.WiimoteRightModified = false
+   var.WiimoteDown          = Wiimote.Down
+   var.WiimoteDownModified  = false
+   var.WiimoteLeft          = Wiimote.Left
+   var.WiimoteLeftModified  = false
+   var.WiimoteUp            = Wiimote.Up
+   var.WiimoteUpModified    = false
+   var.WiimoteMinus         = Wiimote.Minus
+   var.WiimoteMinusModified = false
+   var.WiimoteHome          = Wiimote.Home
+   var.WiimoteHomeModified  = false
+   var.WiimotePlus          = Wiimote.Plus
+   var.WiimotePlusModified  = false
+} else {
+   var.WiimoteA             = false
+   var.WiimoteAModified     = Wiimote.A
+   var.WiimoteRight         = false
+   var.WiimoteRightModified = Wiimote.Right
+   var.WiimoteDown          = false
+   var.WiimoteDownModified  = Wiimote.Down
+   var.WiimoteLeft          = false
+   var.WiimoteLeftModified  = Wiimote.Left
+   var.WiimoteUp            = false
+   var.WiimoteUpModified    = Wiimote.Up
+   var.WiimoteMinus         = false
+   var.WiimoteMinusModified = Wiimote.Minus
+   var.WiimoteHome          = false
+   var.WiimoteHomeModified  = Wiimote.Home
+   var.WiimotePlus          = false
+   var.WiimotePlusModified  = Wiimote.Plus
+}
 
 /*
 Credit: NanoPi's joymouse.PIE
@@ -108,14 +113,14 @@ if var.LookButton = false {
    [var.MouseX, var.MouseY] = [Mouse.DirectInputX, Mouse.DirectInputY]
 }
 
-if (Nunchuk.SmoothRoll < -50) {
+if (Nunchuk.SmoothRoll < -65) {
    //DebugPrint('Nunchuk Roll left: ' + Nunchuk.SmoothRoll)
    var.NunchukRollLeft = true
 } else {
    var.NunchukRollLeft = false
 }
 
-if (Nunchuk.SmoothRoll > 50) {
+if (Nunchuk.SmoothRoll > 65) {
    //DebugPrint('Nunchuk Roll right: ' + Nunchuk.SmoothRoll)
    var.NunchukRollRight = true
 } else {
@@ -159,42 +164,11 @@ if ((var.Moving = true) and (abs(Nunchuk.JoyY) > (var.DiagnlPercentage*abs(Nunch
    var.Fwd = false
 }
 
-/*
-if (var.ModifierButton and Wiimote.SmoothRoll > 70) {
-   //DebugPrint('Wiimote Roll right: ' + Wiimote.SmoothRoll)
-   var.WiimoteRollRightModified = true
-} else {
-   var.WiimoteRollRightModified = false
+/* Dark Souls PTDE diagonal roll fix*/
+if ((var.Lt = true or var.Rt = true) and (Pressed(var.WiimoteA))) {
+   var.Fwd = false
+   var.Bkwd = false
 }
-
-if (var.ModifierButton and Wiimote.SmoothRoll < -70) {
-   //DebugPrint('Wiimote Roll left: ' + Wiimote.SmoothRoll)
-   var.WiimoteRollLeftModified = true
-} else {
-   var.WiimoteRollLeftModified = false
-}
-
-if (var.ModifierButton and Nunchuk.SmoothRoll > 60) {
-   //DebugPrint('Nunchuk Roll right: ' + Nunchuk.SmoothRoll)
-   var.NunchukRollRightModified = true
-} else {
-   var.NunchukRollRightModified = false
-}
-
-if (var.ModifierButton and Nunchuk.SmoothRoll < -60) {
-   //DebugPrint('Nunchuk Roll left: ' + Nunchuk.SmoothRoll)
-   var.NunchukRollLeftModified = true
-} else {
-   var.NunchukRollLeftModified = false
-} 
-
-if (var.ModifierButton and Nunchuk.SmoothPitch > 70) {
-   //DebugPrint('Nunchuk Pitch up: ' + Nunchuk.SmoothRoll)
-   var.NunchukPitchUpModified = true
-} else {
-   var.NunchukPitchUpModified = false
-}
-*/
 
 /*
 // Cycle through weapons 1,2,3,4 with left and right Wiimote:
